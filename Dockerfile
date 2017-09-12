@@ -1,4 +1,4 @@
-FROM node:8.4
+FROM node:8.4-slim
 
 RUN set -x \
     ## - chrome dependencies
@@ -35,18 +35,17 @@ RUN set -x \
     && fc-cache -fv \
     && fc-match \
 
-    ## cleanup
-    && rm -r /var/lib/apt/lists/* 
-
-COPY fonts.conf /root/.config/fontconfig
-
-RUN set -x \
-    ## - puppetter, chromy etc
+    ## - puppeteer
     && yarn add \
         async-await-parallel \
         commander \
-        chromy \
         puppeteer \
-    && ln -s /node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome /usr/local/bin/chrome
+    && ln -s /node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome /usr/local/bin/chrome \
+    
+    ## cleanup
+    && apt-get purge -y --auto-remove \
+        unzip 
+
+COPY fonts.conf /root/.config/fontconfig
 
 ENV CHROME_PATH /usr/local/bin/chrome
